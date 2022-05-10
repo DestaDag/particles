@@ -45,14 +45,14 @@ class Ball:
     def draw(self, screen):
         pygame.draw.circle(screen, self.color, (self.centerX, self.centerY), self.radius)
 
-    def update(self, screen):
+    def update(self, screen, rng, mmin):
 
         if self.centerX <= 20 or self.centerY <= 20:
-            self.velocityX = random.randint(1,5)
-            self.velocityY = random.randint(1,5)
+            self.velocityX = random.randint(mmin,rng)
+            self.velocityY = random.randint(mmin,rng)
         if self.centerX >= 580 or self.centerY >= 580:
-            self.velocityX -= random.randint(1,5)
-            self.velocityY -= random.randint(1,5)
+            self.velocityX -= random.randint(mmin,rng)
+            self.velocityY -= random.randint(mmin,rng)
 
         self.centerX += self.velocityX
         self.centerY += self.velocityY
@@ -100,6 +100,9 @@ def main():
     playa = Player()
     
     timer = 1
+    rng = 5
+    mmin = 1
+    vel = 4
     running = True
     while running:
         for event in pygame.event.get():
@@ -124,13 +127,20 @@ def main():
 
         playa.draw(screen=screen)
 
+
         for ball in balls:
+            if timer%750 == 0:
+                rng += 5
+                mmin += 3
+                for b in balls:
+                    b.velocityX += vel
+                    b.velocityY += vel
             ball.draw(screen =screen)
 
             hit = playa.update(screen=screen, ball=ball)
             if hit == "hit":
                 running = False
-            ball.update(screen= screen)
+            ball.update(screen= screen, rng= rng, mmin=mmin)
 
         clock.tick(60)
         score(timer, screen=screen)
