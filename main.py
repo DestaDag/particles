@@ -1,8 +1,11 @@
+from json.encoder import ESCAPE
 from pydoc import plain
 from turtle import right
 import pygame
 from pygame.locals import *
 import random
+
+pygame.init()
 
 clock = pygame.time.Clock()
 
@@ -11,15 +14,23 @@ Colors ={
     "black": (0,0,0),
     "red": (255,0,0),
     "blue": (0,0,255),
+    "yellow": (255,255,102),
     "random": (random.randint(0, 255),random.randint(0, 255),
     random.randint(0, 255))
 }
 
 
+font_style = pygame.font.SysFont("bahnschrift", 25)
+score_font = pygame.font.SysFont("comicsams", 35)
+
 direction = 1
 
 width = 600
 height = 600
+
+def score(scr, screen):
+    value = score_font.render("Score "+ str(scr), True, Colors["yellow"])
+    screen.blit(value, [0, 0])
 
 
 class Ball:
@@ -27,8 +38,8 @@ class Ball:
         self.centerX = random.randint(0, 600)
         self.centerY = random.randint(0, 600)
         self.color = Colors["red"]
-        self.velocityX = 2
-        self.velocityY = 2
+        self.velocityX = 1
+        self.velocityY = 1
         self.radius = 10
 
     def draw(self, screen):
@@ -57,8 +68,7 @@ class Player(Ball):
     def update(self, screen, ball = Ball()):
         v1 = pygame.math.Vector2(self.centerX, self.centerY)
         v2 = pygame.math.Vector2(ball.centerX, ball.centerY)
-        
-        hit = 1
+
         if v1.distance_to(v2) <= self.radius + ball.radius - 2: 
 
             nv = v2 - v1
@@ -72,13 +82,18 @@ class Player(Ball):
             ball.centerY += round(m2.y)
 
             print("Hit")
+
+            return "hit"
+        
+        return True
+        
+
         
 
 def main():
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("Particles")
 
-    pygame.init()
     clock = pygame.time.Clock()
 
     balls = [Ball() for _ in range(2)]
@@ -92,6 +107,18 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.type == pygame.K_q:
+                    running = False
+                    pygame.quit()
+                if event.key == pygame.K_LEFT:
+                    playa.centerX -= 10
+                elif event.key == pygame.K_RIGHT:
+                    playa.centerX += 10
+                elif event.key == pygame.K_UP:
+                    playa.centerY -= 10
+                elif event.key == pygame.K_DOWN:
+                    playa.centerY += 10
         
         screen.fill(Colors["black"])
 
@@ -99,10 +126,14 @@ def main():
 
         for ball in balls:
             ball.draw(screen =screen)
-            playa.update(screen=screen, ball=ball)
+
+            hit = playa.update(screen=screen, ball=ball)
+            if hit == "hit":
+                running = False
             ball.update(screen= screen)
 
         clock.tick(60)
+        score(timer, screen=screen)
         pygame.display.update()
         
         timer += 1
