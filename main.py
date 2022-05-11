@@ -37,7 +37,7 @@ class Ball:
     def __init__(self, centerX = None, centerY = None, direction = None, color = None, radius = None, speed = None):
         self.centerX = random.randint(0, 600)
         self.centerY = random.randint(0, 600)
-        self.color = Colors["red"]
+        self.color = Colors["random"]
         self.velocityX = 1
         self.velocityY = 1
         self.radius = 10
@@ -63,7 +63,7 @@ class Player(Ball):
         super().__init__(self,radius)
         self.centerX = round(width/2)
         self.centerY = round(height/2)
-        self.color = Colors["white"]
+        self.color = Colors["red"]
     
     def update(self, screen, ball = Ball()):
         v1 = pygame.math.Vector2(self.centerX, self.centerY)
@@ -102,7 +102,9 @@ def main():
     timer = 1
     rng = 5
     mmin = 1
-    vel = 4
+    vel = 1
+
+    
     running = True
     while running:
         for event in pygame.event.get():
@@ -123,15 +125,19 @@ def main():
                 elif event.key == pygame.K_DOWN:
                     playa.centerY += 10
         
+        mx, my  = pygame.mouse.get_pos()
+        playa.centerX = mx
+        playa.centerY = my
+        
         screen.fill(Colors["black"])
 
         playa.draw(screen=screen)
 
 
         for ball in balls:
-            if timer%750 == 0:
-                rng += 5
-                mmin += 3
+            if timer%365 == 0:
+                rng += 1
+                mmin += 1
                 for b in balls:
                     b.velocityX += vel
                     b.velocityY += vel
